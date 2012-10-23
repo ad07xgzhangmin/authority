@@ -1,29 +1,27 @@
--- Logback: the reliable, generic, fast and flexible logging framework.
--- Copyright (C) 1999-2010, QOS.ch. All rights reserved.
---
--- See http://logback.qos.ch/license.html for the applicable licensing 
--- conditions.
+# Logback: the reliable, generic, fast and flexible logging framework.
+# Copyright (C) 1999-2010, QOS.ch. All rights reserved.
+#
+# See http://logback.qos.ch/license.html for the applicable licensing 
+# conditions.
 
--- This SQL script creates the required tables by ch.qos.logback.classic.db.DBAppender
---
--- It is intended for Oracle 9i, 10g and 11g databases. Tested on version 9.2, 
--- 10g and 11g.
+# This SQL script creates the required tables by ch.qos.logback.classic.db.DBAppender.
+#
+# It is intended for MySQL databases. It has been tested on MySQL 5.1.37 
+# on Linux
 
--- The following lines are useful in cleaning any previously existing tables 
 
-drop TRIGGER  logging_event_id_seq_trig; 
-drop SEQUENCE  logging_event_id_seq; 
-drop table  logging_event_property; 
-drop table  logging_event_exception; 
-drop table  logging_event; 
-COMMIT; 
+BEGIN;
+DROP TABLE IF EXISTS logging_event_property;
+DROP TABLE IF EXISTS logging_event_exception;
+DROP TABLE IF EXISTS logging_event;
+COMMIT;
 
-CREATE SEQUENCE logging_event_id_seq MINVALUE 1 START WITH 1;
 
+BEGIN;
 CREATE TABLE logging_event 
   (
-    timestmp         VARCHAR(24) NOT NULL,
-    formatted_message  VARCHAR2(4000) NOT NULL,
+    timestmp         BIGINT NOT NULL,
+    formatted_message  TEXT NOT NULL,
     logger_name       VARCHAR(254) NOT NULL,
     level_string      VARCHAR(254) NOT NULL,
     thread_name       VARCHAR(254),
@@ -36,10 +34,10 @@ CREATE TABLE logging_event
     caller_class      VARCHAR(254) NOT NULL,
     caller_method     VARCHAR(254) NOT NULL,
     caller_line       CHAR(4) NOT NULL,
-    event_id          NUMBER(10) PRIMARY KEY
+    event_id          BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY
   );
-
-
+  
+  
 comment on column logging_event.timestmp is
 '创建记录事件的时间戳';
 comment on column logging_event.formatted_message is
@@ -70,41 +68,29 @@ comment on column logging_event.caller_line is
 '执行记录请求的行号。';
 comment on column logging_event.event_id is
 '记录事件的数据库 ID。 ';
--- the / suffix may or may not be needed depending on your SQL Client
--- Some SQL Clients, e.g. SQuirrel SQL has trouble with the following
--- trigger creation command, while SQLPlus (the basic SQL Client which
--- ships with Oracle) has no trouble at all.
 
-CREATE TRIGGER logging_event_id_seq_trig
-  BEFORE INSERT ON logging_event
-  FOR EACH ROW  
-  BEGIN  
-    SELECT logging_event_id_seq.NEXTVAL 
-    INTO   :NEW.event_id 
-    FROM   DUAL;  
-  END;
-/
+COMMIT;
 
-
+BEGIN;
 CREATE TABLE logging_event_property
   (
-    event_id	      NUMBER(10) NOT NULL,
-    mapped_key        VARCHAR2(254) NOT NULL,
-    mapped_value      VARCHAR2(1024),
+    event_id	      BIGINT NOT NULL,
+    mapped_key        VARCHAR(254) NOT NULL,
+    mapped_value      TEXT,
     PRIMARY KEY(event_id, mapped_key),
     FOREIGN KEY (event_id) REFERENCES logging_event(event_id)
   );
-  
+COMMIT;
+
+BEGIN;
 CREATE TABLE logging_event_exception
   (
-    event_id         NUMBER(10) NOT NULL,
+    event_id         BIGINT NOT NULL,
     i                SMALLINT NOT NULL,
-    trace_line       VARCHAR2(254) NOT NULL,
+    trace_line       VARCHAR(254) NOT NULL,
     PRIMARY KEY(event_id, i),
     FOREIGN KEY (event_id) REFERENCES logging_event(event_id)
   );
-  comment on TABLE logging_event_exception is
+    comment on TABLE logging_event_exception is
 '记录系统错误信息';
-
-
-
+COMMIT;
