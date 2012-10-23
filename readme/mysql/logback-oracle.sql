@@ -4,7 +4,6 @@
 -- See http://logback.qos.ch/license.html for the applicable licensing 
 -- conditions.
 
-
 -- This SQL script creates the required tables by ch.qos.logback.classic.db.DBAppender
 --
 -- It is intended for Oracle 9i, 10g and 11g databases. Tested on version 9.2, 
