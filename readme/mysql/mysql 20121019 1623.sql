@@ -18,8 +18,8 @@
 -- Create schema authority
 --
 
-CREATE DATABASE IF NOT EXISTS authority1;
-USE authority1;
+CREATE DATABASE IF NOT EXISTS authority;
+USE authority;
 
 --
 -- Definition of table `base_fields`
