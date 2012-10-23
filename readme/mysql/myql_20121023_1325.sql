@@ -22,66 +22,6 @@ CREATE DATABASE IF NOT EXISTS authority;
 USE authority;
 
 --
--- Definition of table `base_fields`
---
-
-DROP TABLE IF EXISTS `base_fields`;
-CREATE TABLE `base_fields` (
-  `field_id` int(9) unsigned NOT NULL AUTO_INCREMENT COMMENT '字段ID',
-  `field` varchar(64) DEFAULT NULL COMMENT '字段',
-  `field_name` varchar(128) DEFAULT NULL COMMENT '字段名称',
-  `value_field` varchar(128) DEFAULT NULL COMMENT '字段值',
-  `display_field` varchar(128) DEFAULT NULL COMMENT '字段显示值',
-  `enabled` int(2) unsigned DEFAULT NULL COMMENT '是否启用',
-  `sort` int(2) unsigned DEFAULT NULL COMMENT '排序',
-  PRIMARY KEY (`field_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=72 DEFAULT CHARSET=utf8 COMMENT='系统字段设置表';
-
---
--- Dumping data for table `base_fields`
---
-
-/*!40000 ALTER TABLE `base_fields` DISABLE KEYS */;
-INSERT INTO `base_fields` (`field_id`,`field`,`field_name`,`value_field`,`display_field`,`enabled`,`sort`) VALUES 
- (37,'sex','性别','0','男',1,1),
- (38,'sex','性别','1','女',1,2),
- (39,'sex','性别','2','其他',1,3),
- (40,'sex','性别','3','保密',0,4),
- (41,'pagesize','每页显示条数','10','10条/页',1,1),
- (42,'pagesize','每页显示条数','20','20条/页',1,2),
- (43,'pagesize','每页显示条数','30','30条/页',1,3),
- (44,'pagesize','每页显示条数','50','50条/页',1,4),
- (45,'theme','风格','xtheme-blue.css','经典蓝色',1,1),
- (46,'theme','风格','xtheme-gray.css','简约灰色',1,2),
- (47,'leaf','父模块','0','父节点',1,1),
- (48,'leaf','父模块','1','子节点',1,2),
- (49,'expanded','展开状态','0','收缩',1,1),
- (50,'expanded','展开状态','1','展开',1,2),
- (51,'isdisplay','是否显示','0','否',1,1),
- (52,'isdisplay','是否显示','1','是',1,2),
- (53,'pagesize','每页显示条数','100','100条/页',1,5),
- (54,'pagesize','每页显示条数','200','200条/页',1,6),
- (55,'pagesize','每页显示条数','500','500条/页',0,7),
- (56,'enabled','是否启用','0','禁用',1,2),
- (57,'enabled','是否启用','1','启用',1,1),
- (58,'theme','风格','ext-all-xtheme-brown02.css','灰棕色',1,5),
- (59,'theme','风格','xtheme-calista.css','绿黄双重色',0,8),
- (60,'theme','风格','xtheme-indigo.css','靛青',1,9),
- (61,'theme','风格','xtheme-slate.css','石板色',1,14),
- (62,'theme','风格','xtheme-olive.css','绿色',1,11),
- (63,'theme','风格','xtheme-black.css','黑色',1,6),
- (64,'theme','风格','xtheme-darkgray.css','暗灰',1,7),
- (65,'theme','风格','xtheme-slickness.css','全黑',1,15),
- (66,'theme','风格','ext-all-xtheme-brown.css','红棕色',1,4),
- (67,'theme','风格','ext-all-xtheme-red03.css','粉红',1,6),
- (68,'theme','风格','xtheme-purple.css','紫色',1,13),
- (69,'theme','风格','ext-all-xtheme-blue03.css','灰色',1,3),
- (70,'theme','风格','xtheme-midnight.css','午夜',1,10),
- (71,'theme','风格','xtheme-pink.css','粉红色',1,12);
-/*!40000 ALTER TABLE `base_fields` ENABLE KEYS */;
-
-
---
 -- Definition of table `base_modules`
 --
 
@@ -126,7 +66,11 @@ CREATE TABLE `base_role_module` (
   `role_module_id` int(9) unsigned NOT NULL AUTO_INCREMENT COMMENT '角色模块ID',
   `role_id` int(9) unsigned DEFAULT NULL COMMENT '角色ID',
   `module_id` int(9) unsigned DEFAULT NULL COMMENT '模块ID',
-  PRIMARY KEY (`role_module_id`)
+  PRIMARY KEY (`role_module_id`),
+  KEY `FK_base_role_module_1` (`role_id`),
+  KEY `FK_base_role_module_2` (`module_id`),
+  CONSTRAINT `FK_base_role_module_2` FOREIGN KEY (`module_id`) REFERENCES `base_modules` (`module_id`),
+  CONSTRAINT `FK_base_role_module_1` FOREIGN KEY (`role_id`) REFERENCES `base_roles` (`role_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8 COMMENT='角色模块表';
 
 --
@@ -177,9 +121,13 @@ INSERT INTO `base_roles` (`role_id`,`role_name`,`role_desc`) VALUES
 DROP TABLE IF EXISTS `base_user_role`;
 CREATE TABLE `base_user_role` (
   `user_role_id` int(9) unsigned NOT NULL AUTO_INCREMENT COMMENT '用户角色ID',
-  `user_id` int(9) unsigned NOT NULL COMMENT '用户ID',
-  `role_id` int(9) unsigned NOT NULL COMMENT '角色ID',
-  PRIMARY KEY (`user_role_id`)
+  `user_id` int(9) unsigned DEFAULT NULL COMMENT '用户ID',
+  `role_id` int(9) unsigned DEFAULT NULL COMMENT '角色ID',
+  PRIMARY KEY (`user_role_id`),
+  KEY `FK_base_user_role_1` (`user_id`),
+  KEY `FK_base_user_role_2` (`role_id`),
+  CONSTRAINT `FK_base_user_role_1` FOREIGN KEY (`user_id`) REFERENCES `base_users` (`user_id`),
+  CONSTRAINT `FK_base_user_role_2` FOREIGN KEY (`role_id`) REFERENCES `base_roles` (`role_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COMMENT='用户角色表';
 
 --
